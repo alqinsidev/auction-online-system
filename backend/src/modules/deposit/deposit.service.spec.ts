@@ -1,11 +1,15 @@
 import { Test } from '@nestjs/testing';
-import { HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { DepositService } from './deposit.service';
 import { StoreDepositDTO } from './dto/store-deposit.dto';
 import { AuthPayload } from '../../common/interface/auth/auth.interface';
 import { DataSource, Repository, SelectQueryBuilder, Timestamp } from 'typeorm';
 import { Deposit } from './entities/deposit.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ResponseMessage } from 'src/common/interface/response/response.interface';
+import { DepositHistory } from './entities/deposit-history.entity';
+import HandleErrorException from '../../utils/errorHandler';
+import * as Sentry from '@sentry/node';
 
 describe('DepositService', () => {
   let depositService: DepositService;
@@ -39,6 +43,37 @@ describe('DepositService', () => {
     );
   });
 
+  describe('storeDeposit', () => {
+    it('should throw an error and handle it correctly', async () => {
+      // Create mock objects and functions
+      const mockQueryRunner = {
+        connect: jest.fn(),
+        startTransaction: jest.fn(),
+        manager: {
+          findOne: jest.fn().mockRejectedValue(new Error('Test error')),
+          save: jest.fn(),
+        },
+        commitTransaction: jest.fn(),
+        rollbackTransaction: jest.fn(),
+        release: jest.fn(),
+      };
+
+      dataSource.createQueryRunner = jest.fn().mockReturnValue(mockQueryRunner);
+
+      const storeDepositDto = {
+        store_amount: 50,
+      };
+
+      const mockCaptureException = jest.spyOn(Sentry, 'captureException');
+
+      await expect(
+        depositService.storeDeposit(storeDepositDto, authPayload),
+      ).rejects.toThrow(HttpException);
+
+      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+      expect(mockCaptureException).toHaveBeenCalled();
+    });
+  });
   describe('getMyDeposit', () => {
     it('should return the deposit for the authenticated user', async () => {
       const myDeposit = new Deposit();
