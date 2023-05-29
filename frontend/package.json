@@ -27,6 +27,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.28",
@@ -38,7 +39,6 @@
     "eslint": "^8.38.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
-    "happy-dom": "^9.20.3",
     "jsdom": "^22.1.0",
     "typescript": "^5.0.2",
     "vite": "^4.3.2",
