@@ -81,3 +81,12 @@ The Online Auction System allows users to list their items for auction and parti
 8. This deposit mechanism ensures that the user with the highest bid pays for the item, and the deposit is refunded to non-winning users only after the auction is closed.
 
 
+## Future Work
+
+As the Online Auction System evolves, there are several areas that can be improved and enhanced. Some potential future work includes:
+
+- **Unit Testing**: Implementing unit tests to ensure the reliability and correctness of the system's functionalities. Unit tests help identify and fix any issues or bugs, making the system more robust and stable.
+
+- **Fixing Missing Interfaces**: Addressing any missing interfaces or inconsistencies throughout the program. This includes refining user interfaces, improving user experience, and ensuring a consistent design and flow across different components of the system.
+
+- **CI/CD**: Implementing CI/CD to improve the deployment speed and automation process on the system
