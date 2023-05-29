@@ -56,7 +56,7 @@ const CountDown: React.FC<CountDownProps> = ({ end_date }) => {
     return 'blue';
   };
 
-  return <Tag color={getColor()}>{countdown}</Tag>;
+  return <Tag data-testid="countdown-text" color={getColor()}>{countdown}</Tag>;
 };
 
 export default CountDown;

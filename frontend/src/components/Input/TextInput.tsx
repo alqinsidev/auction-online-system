@@ -13,16 +13,16 @@ interface TextInputProps {
 const TextInput: React.FC<TextInputProps> = ({ value, onChange, label, placeholder = label, errorMessage, secure = false, disabled = false, ...rest }) => {
     return (
         <div>
-            <Typography.Text type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
+            <Typography.Text data-testid='label' type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
             {
                 secure ?
-                    <Input.Password value={value} onChange={onChange} status={errorMessage && errorMessage !== '' ? 'error' : undefined} disabled={disabled} placeholder={placeholder} {...rest} />
+                    <Input.Password data-testid='input-password' value={value} onChange={onChange} status={errorMessage && errorMessage !== '' ? 'error' : undefined} disabled={disabled} placeholder={placeholder} {...rest} />
                     :
-                    <Input value={value} onChange={onChange} status={errorMessage && errorMessage !== '' ? 'error' : undefined} placeholder={placeholder} disabled={disabled} {...rest} />
+                    <Input data-testid='input-text' value={value} onChange={onChange} status={errorMessage && errorMessage !== '' ? 'error' : undefined} placeholder={placeholder} disabled={disabled} {...rest} />
             }
             {
                 errorMessage && errorMessage !== '' &&
-                <Typography.Text type='danger'>{errorMessage}</Typography.Text>
+                <Typography.Text data-testid='error' type='danger'>{errorMessage}</Typography.Text>
             }
         </div>
     )

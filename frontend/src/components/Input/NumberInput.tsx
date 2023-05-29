@@ -11,11 +11,11 @@ interface NumberInputProps {
 const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, label, placeholder = label, errorMessage, ...rest }) => {
     return (
         <Space style={{ width: '100%' }} direction='vertical'>
-            <Typography.Text type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
-            <InputNumber addonBefore={'USD'} formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} min="0" step={1} stringMode value={value.toString()} onChange={(value: string | null) => onChange(Number(value))} status={errorMessage && errorMessage !== '' ? 'error' : undefined} placeholder={placeholder}  {...rest} style={{ width: '100%' }} />
+            <Typography.Text data-testid='label' type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
+            <InputNumber data-testid='input' addonBefore={'USD'} formatter={(value) => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} min="0" step={1} stringMode value={value.toString()} onChange={(value: string | null) => onChange(Number(value))} status={errorMessage && errorMessage !== '' ? 'error' : undefined} placeholder={placeholder}  {...rest} style={{ width: '100%' }} />
             {
                 errorMessage && errorMessage !== '' &&
-                <Typography.Text type='danger'>{errorMessage}</Typography.Text>
+                <Typography.Text data-testid='error' type='danger'>{errorMessage}</Typography.Text>
             }
         </Space>
     )

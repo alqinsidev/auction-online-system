@@ -17,11 +17,11 @@ interface SelectInputProps {
 const SelectInput: React.FC<SelectInputProps> = ({ value, options,onChange, label, placeholder = label, errorMessage, ...rest }) => {
     return (
         <Space style={{ width: '100%' }} direction='vertical'>
-            <Typography.Text type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
-            <Select value={value} onChange={onChange} options={options} {...rest} defaultActiveFirstOption style={{width:'100%'}} placeholder={placeholder}/>
+            <Typography.Text data-testid='label' type={errorMessage && errorMessage !== '' ? 'danger' : undefined} style={{ margin: 0 }}>{label}</Typography.Text>
+            <Select data-testid='select' value={value} onChange={onChange} options={options} {...rest} defaultActiveFirstOption style={{width:'100%'}} placeholder={placeholder}/>
             {
                 errorMessage && errorMessage !== '' &&
-                <Typography.Text type='danger'>{errorMessage}</Typography.Text>
+                <Typography.Text data-testid='error' type='danger'>{errorMessage}</Typography.Text>
             }
         </Space>
     )
