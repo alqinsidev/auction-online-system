@@ -7,6 +7,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { toCurrency } from '../../utils/currency.utils'
 import { ConfirmationModal } from '../../components'
 import { useNavigate } from 'react-router-dom'
+import SocketHelper from '../../helpers/socketHelpers'
 
 
 
@@ -87,6 +88,13 @@ const DraftItem = () => {
         }
 
     }
+
+    useEffect(()=>{
+        const ws = SocketHelper.getConnection()
+        ws.on('AUCTION_EVENT',() => {
+            getBidList()
+        })
+    },[])
 
     useEffect(() => {
         getBidList()
