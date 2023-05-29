@@ -21,6 +21,20 @@ The Online Auction System is a full-stack project that utilizes various technolo
 
 By leveraging these technologies, including the use of Socket.IO for real-time bidding and bid status updates, and Sentry.io for error and logging management, the Online Auction System provides a visually appealing, responsive, and user-friendly auction platform. Users can actively participate in auctions, place bids, and receive immediate notifications on bid updates, while ensuring efficient error tracking and issue resolution for a seamless user experience.
 
+## System Design and ERD
+
+- **System Design**: The system design of the Online Auction System incorporates a React front end connected to a NestJS backend via HTTP and WebSocket, with data stored in a PostgreSQL database. The backend also integrates with RabbitMQ using AMQP to facilitate efficient bid closing. This design ensures a seamless user experience, real-time bid updates, and reliable data storage and retrieval.
+
+
+![system](https://github.com/alqinsidev/auction-online-system/blob/main/docs/image/System%20Design.jpeg)
+
+
+- **ERD**:Here the database design for this project
+
+
+![ERD](https://github.com/alqinsidev/auction-online-system/blob/main/docs/image/erd.jpeg)
+
+
 
 ## Online Version
 
