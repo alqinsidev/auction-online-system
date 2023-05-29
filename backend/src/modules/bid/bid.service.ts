@@ -66,7 +66,10 @@ export class BidService {
     this.consumeMessages();
   }
 
-  async getListBid({ isDraft = false }): Promise<ResponseMessage<any>> {
+  async getListBid(
+    { isDraft = false },
+    authPayload: AuthPayload,
+  ): Promise<ResponseMessage<any>> {
     try {
       const queryBuilder = this.bidItemRepository
         .createQueryBuilder('bid_items')
@@ -85,10 +88,11 @@ export class BidService {
           'users.full_name',
         ])
         .leftJoin('bid_items.user', 'users')
+        .where('bid_items.user_id = :user_id', { user_id: authPayload.id })
         .orderBy('bid_items.updated_at', 'DESC');
 
       if (isDraft) {
-        queryBuilder.where('bid_items.isDraft = :isDraft', { isDraft });
+        queryBuilder.andWhere('bid_items.isDraft = :isDraft', { isDraft });
       }
 
       const res = await queryBuilder.getMany();

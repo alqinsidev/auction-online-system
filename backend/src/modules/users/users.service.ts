@@ -1,14 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Deposit } from '../deposit/entities/deposit.entity';
-import { hashString } from 'src/helpers/bcrypt.helper';
-import HandleError from 'src/utils/errorHandler';
-import { ResponseMessage } from 'src/common/interface/response/response.interface';
-import HandleErrorException from 'src/utils/errorHandler';
+import { hashString } from '../../helpers/bcrypt.helper';
+import HandleError from '../../utils/errorHandler';
+import { ResponseMessage } from '../../common/interface/response/response.interface';
+import HandleErrorException from '../../utils/errorHandler';
 
 @Injectable()
 export class UsersService {
@@ -61,11 +60,6 @@ export class UsersService {
       await queryRunner.release();
     }
   }
-
-  findAll() {
-    return `This action returns all users`;
-  }
-
   async findOne(id: string): Promise<ResponseMessage<any>> {
     try {
       const user = await this.userRepository.findOne({
@@ -83,13 +77,5 @@ export class UsersService {
     } catch (error) {
       throw HandleErrorException(error);
     }
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

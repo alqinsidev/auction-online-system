@@ -50,6 +50,8 @@ export class DepositService {
         status: HttpStatus.OK,
       };
     } catch (error) {
+      console.error(error);
+
       await queryRunner.rollbackTransaction();
       throw HandleErrorException(error);
     } finally {

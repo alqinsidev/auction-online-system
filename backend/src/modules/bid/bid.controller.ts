@@ -20,10 +20,13 @@ export class BidController {
   constructor(private readonly bidService: BidService) {}
 
   @Get('')
-  getBidItem(@Query('isDraft') isDraft: string) {
-    return this.bidService.getListBid({
-      isDraft: isDraft === 'true' ? true : false,
-    });
+  getBidItem(@Query('isDraft') isDraft: string, @Request() req: any) {
+    return this.bidService.getListBid(
+      {
+        isDraft: isDraft === 'true' ? true : false,
+      },
+      req.user,
+    );
   }
   @Get('auction')
   getAuctionList(@Query('status') status: string, @Request() req: any) {
