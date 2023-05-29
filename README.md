@@ -33,8 +33,8 @@ The Online Auction System is also available online, deployed on Amazon EC2 as a 
 3. Install backend dependencies: `cd backend && npm install`
 4. Set up the PostgreSQL database with the required credentials and create a new database (if not already created).
 5. Configure the backend environment:
-   - Rename the `.env.example` file in the `backend` directory to `.env`.
-   - Open the `.env` file and set the database connection details (`DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE`) to match your PostgreSQL setup.
+   - Rename the `.env.example` file in the `backend` and `frontend` directory to `.env`.
+   - Open the `.env` file and set everything to your own environment
 6. Migrate the database schema:
    - Run the migration command: `cd backend && npm run migrate`.
    - This command will create the necessary tables and schema in the specified database.
