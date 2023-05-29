@@ -1,0 +1,54 @@
+version: '3'
+services:
+  rabbitmq:
+    container_name: rabbitmq-service
+    build:
+      context: ./docker/rabbitmq
+      dockerfile: Dockerfile
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./docker/rabbitmq/data/:/var/lib/rabbitmq/mnesia
+      - ./docker/rabbitmq/log/:/var/log/rabbitmq
+    env_file:
+      - ./docker/env/.rabbitmq.env
+  postgres:
+    container_name: postgre
+    env_file:
+      - ./docker/env/.postgres.env
+    volumes:
+        - './docker/postgres/:/var/lib/postgresql/data'
+    image: postgres
+    ports:
+        - '5432:5432'
+  backend:
+    container_name: be-service
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+    ports:
+      - 2701:2701
+    env_file:
+      - ./docker/env/.backend.env
+    links:
+      - postgres
+      - rabbitmq
+  frontend:
+    container_name: fe-service
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - 8080:80
+    env_file:
+      - ./docker/env/.frontend.env
+    
+
+

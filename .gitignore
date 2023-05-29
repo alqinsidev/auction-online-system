@@ -1,0 +1,9 @@
+/docker/postgres/*
+/docker/rabbitmq/data/*
+/docker/rabbitmq/log/*
+
+/frontend/node_modules/*
+/frontend/dist/*
+
+/backend/node_modules/*
+/backend/dist/*

@@ -1,0 +1,12 @@
+.color-changing-component {
+    transition: color .2s;
+  }
+  
+  .color-changing-component.green {
+    color: green;
+  }
+  
+  .color-changing-component.black {
+    color: black;
+  }
+  
