@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { StoreDepositDTO } from './dto/store-deposit.dto';
-import { AuthPayload } from 'src/common/interface/auth/auth.interface';
+import { AuthPayload } from '../../common/interface/auth/auth.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Deposit } from './entities/deposit.entity';
 import { DataSource, Repository } from 'typeorm';
 import { DepositHistory } from './entities/deposit-history.entity';
-import HandleErrorException from 'src/utils/errorHandler';
-import { ResponseMessage } from 'src/common/interface/response/response.interface';
+import HandleErrorException from '../../utils/errorHandler';
+import { ResponseMessage } from '../../common/interface/response/response.interface';
 
 @Injectable()
 export class DepositService {
@@ -57,9 +57,7 @@ export class DepositService {
     }
   }
 
-  async getMyDeposit(
-    authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  async getMyDeposit(authPayload: AuthPayload): Promise<ResponseMessage<any>> {
     try {
       const myDeposit = await this.depositRepository.findOne({
         where: { user_id: authPayload.id },

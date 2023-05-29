@@ -1,16 +1,15 @@
 // auth.service.ts
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDTO } from './dto/login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/modules/users/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtAuthService } from '../jwt/jwt.service';
-import { ResponseMessage } from 'src/common/interface/response/response.interface';
-import { AuthResponse } from 'src/common/interface/auth/auth.interface';
-import { UserData } from 'src/common/interface/user/user.interface';
-import SentryHandleExeption from 'src/utils/errorHandler';
-import { compareHash } from 'src/helpers/bcrypt.helper';
-import HandleErrorException from 'src/utils/errorHandler';
+import { ResponseMessage } from '../../common/interface/response/response.interface';
+import { AuthResponse } from '../../common/interface/auth/auth.interface';
+import { UserData } from '../../common/interface/user/user.interface';
+import { compareHash } from '../../helpers/bcrypt.helper';
+import HandleErrorException from '../../utils/errorHandler';
 
 @Injectable()
 export class AuthService {

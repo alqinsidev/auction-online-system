@@ -1,18 +1,45 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from './jwt.service';
+// jwt-auth.service.spec.ts
+import { Test } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
+import { JwtAuthService } from './jwt.service';
 
-describe('JwtService', () => {
-  let service: JwtService;
+describe('JwtAuthService', () => {
+  let jwtAuthService: JwtAuthService;
+  let jwtService: JwtService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [JwtService],
+    const moduleRef = await Test.createTestingModule({
+      providers: [
+        JwtAuthService,
+        {
+          provide: JwtService,
+          useValue: {
+            signAsync: jest.fn().mockResolvedValue('mockAccessToken'),
+            verifyAsync: jest.fn().mockResolvedValue({ userId: 1 }),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<JwtService>(JwtService);
+    jwtAuthService = moduleRef.get<JwtAuthService>(JwtAuthService);
+    jwtService = moduleRef.get<JwtService>(JwtService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('generateToken', () => {
+    it('should generate a token', async () => {
+      const payload = { userId: 1 };
+      const result = await jwtAuthService.generateToken(payload);
+      expect(result).toBe('mockAccessToken');
+      expect(jwtService.signAsync).toHaveBeenCalledWith(payload);
+    });
+  });
+
+  describe('verifyToken', () => {
+    it('should verify a token', async () => {
+      const token = 'mockToken';
+      const result = await jwtAuthService.verifyToken(token);
+      expect(result).toEqual({ userId: 1 });
+      expect(jwtService.verifyAsync).toHaveBeenCalledWith(token);
+    });
   });
 });
