@@ -24,9 +24,7 @@ services:
         - '5432:5432'
   backend:
     container_name: be-service
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    image: alqinsidev/auction-system-be
     restart: always
     depends_on:
       - postgres
@@ -40,9 +38,7 @@ services:
       - rabbitmq
   frontend:
     container_name: fe-service
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: alqinsidev/auction-system-fe
     depends_on:
       - backend
     ports:
