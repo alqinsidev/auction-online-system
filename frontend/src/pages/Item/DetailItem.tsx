@@ -1,9 +1,8 @@
-import { Button, Card, Col, Row, Space, Statistic, Table, Tag, Typography } from 'antd';
-import React, { useEffect, useState } from 'react'
+import { Card, Col, Row, Space, Statistic, Table, Tag, Typography } from 'antd';
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import BidServices from '../../services/bid.service';
 import HandleError from '../../utils/errorHandler.utils';
-import { ColumnType } from 'antd/es/table';
 import { BidHistory, BidResponse } from '../../common/interface/bid.interface';
 import moment from 'moment';
 import { toCurrency } from '../../utils/currency.utils';
@@ -30,13 +29,13 @@ const DetailItem = () => {
             title:'Bid Date',
             key: 'created_at',
             dataIndex:'created_at',
-            render: (data) => moment(data).format(`YYYY/MM/DD HH:mm`)
+            render: (data:string) => moment(data).format(`YYYY/MM/DD HH:mm`)
         },
     ]
     
     const getDetailItem = async ()=> {
         try {
-            const item = await BidServices.getBidHistory(id)
+            const item = await BidServices.getBidHistory(id || '')
             setBidItem(item.data)
         } catch (error) {
             HandleError(error)
@@ -79,7 +78,7 @@ const DetailItem = () => {
                 </Typography.Title>
                 {
                     bidItem &&
-                    <Table pagination={false} columns={tableColumns} dataSource={bidItem.bid_history} rowKey={(row) => row.u} />
+                    <Table pagination={false} columns={tableColumns} dataSource={bidItem.bid_history} rowKey={(row: BidHistory) => row.user_id} />
                 }
             </Space>
         </Card>

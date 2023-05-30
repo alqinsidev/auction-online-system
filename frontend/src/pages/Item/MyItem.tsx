@@ -120,7 +120,7 @@ const MyItem = () => {
                 </Typography.Title>
                 <Card>
                     <Space direction='vertical' style={{ width: '100%' }}>
-                        <Button size='medium' type='primary' onClick={()=> navigate('/item/new')}>Create Item</Button>
+                        <Button size='middle' type='primary' onClick={()=> navigate('/item/new')}>Create Item</Button>
                         <Table pagination={false} columns={tableColumns} dataSource={bidItemsList} rowKey={(row) => row.id} />
                     </Space>
                 </Card>
