@@ -1,5 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import ConfirmationModal from './ConfirmationModal';
+import '@testing-library/jest-dom'
 
 describe('ConfirmationModal', () => {
   test('renders modal with correct props', () => {

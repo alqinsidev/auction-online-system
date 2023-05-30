@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom'
-import '@testing-library/jest-dom'
+import matchers from '@testing-library/jest-dom/matchers'
+import { expect, vi } from 'vitest'
+
+expect.extend(matchers)
 
 Object.defineProperty(window, 'matchMedia', {
     writable: true,

@@ -1,13 +1,15 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import CountDown from './CountDown';
+import '@testing-library/jest-dom'
+
 
 vi.mock('moment', () => ({
   default: () => ({
     isBefore: () => false,
     duration: () => ({
-      asHours: jest.fn().mockReturnValue(0),
-      minutes: jest.fn().mockReturnValue(1),
-      seconds: jest.fn().mockReturnValue(30),
+      asHours: vi.fn().mockReturnValue(0),
+      minutes: vi.fn().mockReturnValue(1),
+      seconds: vi.fn().mockReturnValue(30),
     }),
   }),
 }));
@@ -44,7 +46,7 @@ describe('CountDown', () => {
   it('should change tag color based on countdown time', () => {
     render(<CountDown end_date="2023-01-01T00:00:30Z" />);
     const tagElement = screen.getByTestId('countdown-text');
-    expect(tagElement).toHaveClass('ant-tag-blue'); // Assuming you have a CSS class 'red' for the red color
+    expect(tagElement).toHaveClass('ant-tag-blue');
   });
 
   // it('should update countdown time after 1 second', () => {

@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import NumberInput from './NumberInput';
+import '@testing-library/jest-dom'
+
 
 describe('NumberInput', () => {
   test('should call onChange callback with the correct value when input changes', () => {

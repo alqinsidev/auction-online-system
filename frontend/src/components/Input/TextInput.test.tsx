@@ -1,5 +1,7 @@
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import TextInput from './TextInput';
+import '@testing-library/jest-dom'
+
 
 describe('TextInput', () => {
   test('renders label and input element correctly', () => {
