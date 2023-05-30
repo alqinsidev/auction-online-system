@@ -263,7 +263,7 @@ The Online Auction System allows users to list their items for auction and parti
   
   
 
-4. Once user submit the item, it will save as a draft.
+4. Once user submit the item, it will be saved as a draft.
 
 
 5. User item will not be listed on the auction unless the user publish their item.
