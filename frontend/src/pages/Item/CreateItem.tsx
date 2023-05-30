@@ -23,7 +23,7 @@ const CreateItem = () => {
             description: 'Item has been listed',
             placement: 'topRight',
             duration: 2,
-            onClose: () => navigate('/my-item')
+            onClose: () => navigate('/item')
         });
     };
     const ErrorNotification = () => {

@@ -17,7 +17,7 @@ const AdminLayout: React.FC = () => {
     const dropdownMenu: MenuProps['items'] = [
         {
             key: '1',
-            label: <a target='_blank' onClick={() => navigate('/my-item')}>My Item</a>
+            label: <a target='_blank' onClick={() => navigate('/item')}>My Item</a>
         },
         {
             key: '2',

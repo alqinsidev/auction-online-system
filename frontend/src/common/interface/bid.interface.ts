@@ -44,7 +44,21 @@ export interface BidResponse {
   last_price: number;
   isDraft: boolean;
   isCompleted: boolean;
+  time_window?: number;
   created_at: string;
   updated_at: string;
-  user: User;
+  user?: User;
+  winner?: User;
+  bid_history?: BidHistory[]
+
 }
+
+export interface BidHistory {
+  user_id: string;
+  bid_amount: number;
+  created_at: string;
+  user: {
+    full_name: string;
+  };
+}
+

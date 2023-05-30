@@ -86,8 +86,11 @@ export class BidService {
           'bid_items.updated_at',
           'users.id',
           'users.full_name',
+          'winner.id',
+          'winner.full_name',
         ])
         .leftJoin('bid_items.user', 'users')
+        .leftJoin('bid_items.winner', 'winner')
         .where('bid_items.user_id = :user_id', { user_id: authPayload.id })
         .orderBy('bid_items.updated_at', 'DESC');
 
@@ -104,6 +107,7 @@ export class BidService {
       throw HandleErrorException(error);
     }
   }
+
   async getAuctionList(
     { status = undefined },
     authPayload: AuthPayload,
@@ -124,8 +128,11 @@ export class BidService {
           'bid_items.updated_at',
           'users.id',
           'users.full_name',
+          'winner.id',
+          'winner.full_name',
         ])
         .leftJoin('bid_items.user', 'users')
+        .leftJoin('bid_items.winner', 'winner')
         .where(`bid_items.user_id != :user_id`, { user_id: authPayload.id })
         .andWhere(`bid_items.isDraft = false`)
         .orderBy(`bid_items.updated_at`, 'DESC');
@@ -413,6 +420,45 @@ export class BidService {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async getBidHistory(bid_id: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    try {
+      const bidHistory = await this.bidItemRepository
+        .createQueryBuilder('bid_items')
+        .select([
+          'bid_items.id',
+          'bid_items.name',
+          'bid_items.start_price',
+          'bid_items.last_price',
+          'bid_items.isDraft',
+          'bid_items.isCompleted',
+          'bid_items.time_window',
+          'bid_items.start_date',
+          'bid_items.end_date',
+          'bid_items.created_at',
+          'bid_items.updated_at',
+          'winner.full_name',
+          'history.user_id',
+          'history.bid_amount',
+          'bidder.full_name',
+          'bidder.created_at',
+        ])
+        .leftJoin('bid_items.winner', 'winner')
+        .leftJoin('bid_items.bid_history', 'history')
+        .leftJoin('history.user', 'bidder')
+        .where('bid_items.id = :bid_id', { bid_id })
+        .getOne();
+
+      return {
+        status: HttpStatus.OK,
+        data: bidHistory,
+      };
+    } catch (error) {
+      throw HandleErrorException(error);
     }
   }
 }

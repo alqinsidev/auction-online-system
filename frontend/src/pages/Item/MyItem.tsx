@@ -11,7 +11,7 @@ import SocketHelper from '../../helpers/socketHelpers'
 
 
 
-const DraftItem = () => {
+const MyItem = () => {
     const navigate = useNavigate()
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -31,6 +31,18 @@ const DraftItem = () => {
             dataIndex: 'start_price',
             key: 'start_price',
             render: (data) => `$${toCurrency(data)}`
+        },
+        {
+            title: 'Last Price',
+            dataIndex: 'last_price',
+            key: 'last_price',
+            render: (data) => `$${toCurrency(data)}`
+        },
+        {
+            title: 'Bid Winner',
+            dataIndex: 'winner',
+            key: 'winner',
+            render: (data) => data ? <Tag color='red'>{data.full_name}</Tag> : '-'
         },
         {
             title: 'Status',
@@ -58,9 +70,9 @@ const DraftItem = () => {
                     setIsConfirmModalVisible(true)
                 }
                 if (!row.isCompleted && row.isDraft) {
-                    return (<Button type='primary' danger onClick={handleSelectItem}>Publish</Button>)
+                    return (<Button type='primary' size='small' danger onClick={handleSelectItem}>Publish</Button>)
                 } else {
-                    return null
+                    return <Button type='primary' size='small' onClick={()=> navigate(`/item/detail/${data}`)}>Detail</Button>
                 }
             }
         },
@@ -108,7 +120,7 @@ const DraftItem = () => {
                 </Typography.Title>
                 <Card>
                     <Space direction='vertical' style={{ width: '100%' }}>
-                        <Button type='primary' onClick={()=> navigate('/new-item')}>Create Item</Button>
+                        <Button size='medium' type='primary' onClick={()=> navigate('/item/new')}>Create Item</Button>
                         <Table pagination={false} columns={tableColumns} dataSource={bidItemsList} rowKey={(row) => row.id} />
                     </Space>
                 </Card>
@@ -118,4 +130,4 @@ const DraftItem = () => {
     )
 }
 
-export default DraftItem
+export default MyItem
