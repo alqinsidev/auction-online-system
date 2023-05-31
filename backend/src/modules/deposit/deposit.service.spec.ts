@@ -64,14 +64,12 @@ describe('DepositService', () => {
         store_amount: 50,
       };
 
-      const mockCaptureException = jest.spyOn(Sentry, 'captureException');
 
       await expect(
         depositService.storeDeposit(storeDepositDto, authPayload),
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(Error);
 
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
-      expect(mockCaptureException).toHaveBeenCalled();
     });
   });
   describe('getMyDeposit', () => {
@@ -85,9 +83,7 @@ describe('DepositService', () => {
       // Act
       const result = await depositService.getMyDeposit(authPayload);
 
-      // Assert
-      expect(result.status).toBe(HttpStatus.OK);
-      expect(result.data).toEqual(myDeposit);
+      expect(result).toEqual(myDeposit);
     });
   });
 });

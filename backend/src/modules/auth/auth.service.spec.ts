@@ -64,10 +64,9 @@ describe('AuthService', () => {
 
       const result = await authService.login(loginPayload);
 
-      expect(result.status).toBe(HttpStatus.OK);
-      expect(result.message).toBe('login successfully');
-      expect(result.data.accessToken).toBe('mockAccessToken');
-      expect(result.data.userData).toEqual({
+
+      expect(result.accessToken).toBe('mockAccessToken');
+      expect(result.userData).toEqual({
         id: 'user_1',
         full_name: 'padlan',
         email: 'padlanalqinsi@gmail.com',
@@ -97,7 +96,7 @@ describe('AuthService', () => {
       }
 
       expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe('user not found');
+      expect(error.message).toBe('User not found');
     });
 
     it('should throw an error if the password does not match', async () => {
@@ -126,7 +125,7 @@ describe('AuthService', () => {
       }
 
       expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe('password not match');
+      expect(error.message).toBe('Password not match');
     });
   });
 });
