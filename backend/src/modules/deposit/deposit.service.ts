@@ -5,8 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Deposit } from './entities/deposit.entity';
 import { DataSource, Repository } from 'typeorm';
 import { DepositHistory } from './entities/deposit-history.entity';
-import HandleErrorException from '../../utils/errorHandler';
+import HandleErrorException, {
+  NotFoundError,
+} from '../../utils/errorHandling.utils';
 import { ResponseMessage } from '../../common/interface/response/response.interface';
+import { StoreDepositResponse } from 'src/common/interface/deposit/deposit.interface';
 
 @Injectable()
 export class DepositService {
@@ -19,7 +22,7 @@ export class DepositService {
   async storeDeposit(
     storeDepositDto: StoreDepositDTO,
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<StoreDepositResponse> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -44,33 +47,26 @@ export class DepositService {
         updated_deposit: updatedDeposit.amount,
         store_amount: storeDepositDto.store_amount,
       };
-      return {
-        data: responseData,
-        message: 'successfully store deposit',
-        status: HttpStatus.OK,
-      };
+      return responseData;
     } catch (error) {
-      console.error(error);
-
       await queryRunner.rollbackTransaction();
-      throw HandleErrorException(error);
+      throw error;
     } finally {
       await queryRunner.release();
     }
   }
 
-  async getMyDeposit(authPayload: AuthPayload): Promise<ResponseMessage<any>> {
+  async getMyDeposit(authPayload: AuthPayload): Promise<Deposit> {
     try {
       const myDeposit = await this.depositRepository.findOne({
         where: { user_id: authPayload.id },
       });
-
-      return {
-        status: HttpStatus.OK,
-        data: myDeposit,
-      };
+      if (!myDeposit) {
+        throw new NotFoundError('id not found');
+      }
+      return myDeposit;
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 }

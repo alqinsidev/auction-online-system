@@ -1,6 +1,6 @@
 import {
   AuthPayload,
-  AuthResponse,
+  LoginResponse,
   NewUserPayload,
   RegisterResponse,
 } from "../common/interface/auth.interface";
@@ -12,7 +12,7 @@ import { client } from "../utils/httpClient.utils";
 const AuthServices = {
   signIn: async (
     payload: AuthPayload
-  ): Promise<ResponseMessage<AuthResponse>> => {
+  ): Promise<ResponseMessage<LoginResponse>> => {
     const res = await client.post("/auth/login", payload);
     const { data } = res.data;
     const newAuthState = {

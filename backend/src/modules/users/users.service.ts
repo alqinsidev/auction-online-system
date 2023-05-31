@@ -1,13 +1,14 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Deposit } from '../deposit/entities/deposit.entity';
 import { hashString } from '../../helpers/bcrypt.helper';
-import HandleError from '../../utils/errorHandler';
-import { ResponseMessage } from '../../common/interface/response/response.interface';
-import HandleErrorException from '../../utils/errorHandler';
+import {
+  BadRequestError,
+  NotFoundError,
+} from '../../utils/errorHandling.utils';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +18,7 @@ export class UsersService {
     private dataSource: DataSource,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<any> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -30,7 +31,7 @@ export class UsersService {
       });
 
       if (user) {
-        throw 'email has been used, try another email';
+        throw new BadRequestError('email has been used, try another email');
       }
 
       const newUserData = {
@@ -48,19 +49,15 @@ export class UsersService {
 
       await queryRunner.commitTransaction();
 
-      return {
-        status: HttpStatus.CREATED,
-        data: { user: newUser },
-        message: 'user has been created',
-      };
+      return { user: newUser };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw HandleError(error);
+      throw error;
     } finally {
       await queryRunner.release();
     }
   }
-  async findOne(id: string): Promise<ResponseMessage<any>> {
+  async findOne(id: string): Promise<User> {
     try {
       const user = await this.userRepository.findOne({
         where: { id },
@@ -68,14 +65,11 @@ export class UsersService {
         relations: { deposit: true },
       });
       if (!user) {
-        throw 'user not found';
+        throw new NotFoundError('user not found');
       }
-      return {
-        status: HttpStatus.OK,
-        data: user,
-      };
+      return user;
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 }

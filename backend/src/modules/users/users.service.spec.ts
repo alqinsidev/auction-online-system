@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { DataSource } from 'typeorm';
-import HandleError from '../../utils/errorHandler';
+import HandleError from '../../utils/errorHandling.utils';
 import { Deposit } from '../deposit/entities/deposit.entity';
 
 describe('UsersService', () => {

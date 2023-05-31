@@ -1,11 +1,14 @@
 import 'dotenv/config';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateBidItemDTO } from './dto/create-bid-item.dto';
 import { AuthPayload } from 'src/common/interface/auth/auth.interface';
 import { DataSource, Not, Repository, Timestamp } from 'typeorm';
 import { BidItem } from './entities/bid-item.entity';
-import { ResponseMessage } from '../../common/interface/response/response.interface';
-import HandleErrorException from '../../utils/errorHandler';
+import HandleErrorException, {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from '../../utils/errorHandling.utils';
 import { MakeBidDTO } from './dto/make-bid.dto';
 import { BidHistory } from './entities/bid-history.entity';
 import { Deposit } from '../deposit/entities/deposit.entity';
@@ -13,7 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PublishBidDTO } from './dto/publish-bid.dto';
 import * as amqp from 'amqplib';
 import * as moment from 'moment';
-import amqpHelper from '../../utils/amqpHelper';
+import amqpHelper from '../../helpers/amqp.helper';
 import { AmqpPublishPayload } from '../../common/interface/amqp/amqp.interface';
 import { DepositHistory } from '../deposit/entities/deposit-history.entity';
 import { WebsocketGateway } from '../websocket/websocket.gateway';
@@ -69,7 +72,7 @@ export class BidService {
   async getListBid(
     { isDraft = false },
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<BidItem[]> {
     try {
       const queryBuilder = this.bidItemRepository
         .createQueryBuilder('bid_items')
@@ -98,20 +101,16 @@ export class BidService {
         queryBuilder.andWhere('bid_items.isDraft = :isDraft', { isDraft });
       }
 
-      const res = await queryBuilder.getMany();
-      return {
-        status: HttpStatus.OK,
-        data: res,
-      };
+      return await queryBuilder.getMany();
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 
   async getAuctionList(
     { status = undefined },
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<BidItem[]> {
     try {
       const queryBuilder = this.bidItemRepository
         .createQueryBuilder('bid_items')
@@ -149,11 +148,7 @@ export class BidService {
         }
       }
 
-      const res = await queryBuilder.getMany();
-      return {
-        status: HttpStatus.OK,
-        data: res,
-      };
+      return await queryBuilder.getMany();
     } catch (error) {
       throw HandleErrorException(error);
     }
@@ -162,7 +157,7 @@ export class BidService {
   async createBidItem(
     createBidItemDTO: CreateBidItemDTO,
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<BidItem> {
     try {
       const newBidItemData = this.bidItemRepository.create({
         ...createBidItemDTO,
@@ -170,34 +165,28 @@ export class BidService {
         last_price: createBidItemDTO.start_price,
       });
       const newBidItem = await this.bidItemRepository.save(newBidItemData);
-      return {
-        status: HttpStatus.CREATED,
-        data: newBidItem,
-        message: 'New item has been added',
-      };
+      return newBidItem;
     } catch (error) {
-      console.error(error);
-
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 
   async publishBid(
     publishBidDTO: PublishBidDTO,
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<BidItem> {
     try {
       const bid = await this.bidItemRepository.findOne({
         where: { id: publishBidDTO.bid_id },
       });
       if (!bid) {
-        throw 'bid not found';
+        throw new NotFoundError('bid not found');
       }
       if (authPayload.id !== bid.user_id) {
-        throw 'you dont have authorization on this bid';
+        throw new ForbiddenError('you dont have permission on this bid');
       }
       if (!bid.isDraft) {
-        throw 'bid already published';
+        throw new BadRequestError('bid already published');
       }
 
       const lastBid = await this.bidItemRepository.findOne({
@@ -216,7 +205,9 @@ export class BidService {
         );
 
         if (timeDifference.asSeconds() < 5) {
-          throw 'you need to wait 5s after your published a bid';
+          throw new BadRequestError(
+            'you need to wait 5s after your published a bid',
+          );
         }
       }
 
@@ -239,20 +230,16 @@ export class BidService {
 
       const socketClient = this.ws.getServer();
       socketClient.emit('AUCTION_EVENT', updatedBid);
-      return {
-        status: HttpStatus.OK,
-        data: updatedBid,
-        message: 'bid has been published',
-      };
+      return updatedBid;
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 
   async makeBid(
     makeBidDto: MakeBidDTO,
     authPayload: AuthPayload,
-  ): Promise<ResponseMessage<any>> {
+  ): Promise<BidItem> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -262,7 +249,7 @@ export class BidService {
       });
 
       if (!bidItem) {
-        throw 'bid not found';
+        throw new NotFoundError('bid not found');
       }
 
       const currentUserDeposit = await queryRunner.manager.findOne(Deposit, {
@@ -270,7 +257,7 @@ export class BidService {
       });
 
       if (bidItem.isDraft) {
-        throw 'bid still not open yet';
+        throw new BadRequestError('bid still not open yet');
       }
 
       const auctionHasOver =
@@ -279,19 +266,21 @@ export class BidService {
         ) || bidItem.isCompleted;
 
       if (auctionHasOver) {
-        throw 'auction for this item was closed';
+        throw new BadRequestError('auction for this item was closed');
       }
 
       if (bidItem.user_id === authPayload.id) {
-        throw `you can't bid for your item`;
+        throw new BadRequestError(`you can't bid for your item`);
       }
 
       if (makeBidDto.bid_amount > currentUserDeposit.amount) {
-        throw 'you have unsuficent deposit';
+        throw new BadRequestError('you have unsuficent deposit');
       }
 
       if (bidItem.last_price >= makeBidDto.bid_amount) {
-        throw 'bid amount must be higher than last bid price';
+        throw new BadRequestError(
+          'bid amount must be higher than last bid price',
+        );
       }
 
       const lastBidOnThisItem = await queryRunner.manager.findOne(BidHistory, {
@@ -316,7 +305,7 @@ export class BidService {
         );
 
         if (timeDifference.asSeconds() < 5) {
-          throw 'you need to wait 5s after your last bid';
+          throw new BadRequestError('you need to wait 5s after your last bid');
         }
       }
       currentUserDeposit.amount = currentUserDeposit.amount - depositBill;
@@ -333,15 +322,10 @@ export class BidService {
 
       const socketClient = this.ws.getServer();
       socketClient.emit('AUCTION_EVENT', updatedBidItem);
-      return {
-        data: updatedBidItem,
-        status: HttpStatus.CREATED,
-      };
+      return updatedBidItem;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error(error);
-
-      throw HandleErrorException(error);
+      throw error;
     } finally {
       await queryRunner.release();
     }
@@ -416,14 +400,14 @@ export class BidService {
       socketClient.emit('AUCTION_EVENT', bidItem);
       socketClient.emit('DEPOSIT_EVENT', bidItem);
     } catch (error) {
-      console.error(error);
       await queryRunner.rollbackTransaction();
+      Sentry.captureException(error);
     } finally {
       await queryRunner.release();
     }
   }
 
-  async getBidHistory(bid_id: string) {
+  async getBidHistory(bid_id: string): Promise<BidItem> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     try {
@@ -453,12 +437,12 @@ export class BidService {
         .where('bid_items.id = :bid_id', { bid_id })
         .getOne();
 
-      return {
-        status: HttpStatus.OK,
-        data: bidHistory,
-      };
+      if (!bidHistory) {
+        throw new NotFoundError('item not found');
+      }
+      return bidHistory;
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 }

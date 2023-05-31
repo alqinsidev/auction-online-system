@@ -1,15 +1,17 @@
 // auth.service.ts
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoginDTO } from './dto/login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtAuthService } from '../jwt/jwt.service';
-import { ResponseMessage } from '../../common/interface/response/response.interface';
-import { AuthResponse } from '../../common/interface/auth/auth.interface';
+import { LoginResponse } from '../../common/interface/auth/auth.interface';
 import { UserData } from '../../common/interface/user/user.interface';
 import { compareHash } from '../../helpers/bcrypt.helper';
-import HandleErrorException from '../../utils/errorHandler';
+import {
+  BadRequestError,
+  NotFoundError,
+} from '../../utils/errorHandling.utils';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +21,7 @@ export class AuthService {
     private readonly jwtAuthService: JwtAuthService,
   ) {}
 
-  async login(loginDto: LoginDTO): Promise<ResponseMessage<AuthResponse>> {
+  async login(loginDto: LoginDTO): Promise<LoginResponse> {
     try {
       const user = await this.userRepository.findOne({
         where: {
@@ -29,7 +31,7 @@ export class AuthService {
       });
 
       if (!user) {
-        throw 'user not found';
+        throw new NotFoundError('User not found');
       }
 
       const isPasswordMatch = await compareHash(
@@ -38,7 +40,7 @@ export class AuthService {
       );
 
       if (!isPasswordMatch) {
-        throw 'password not match';
+        throw new BadRequestError('Password not match');
       }
 
       const userData: UserData = {
@@ -51,14 +53,10 @@ export class AuthService {
       const accessToken = await this.jwtAuthService.generateToken(
         JSON.stringify(userData),
       );
-      const data: AuthResponse = { accessToken, userData };
-      return {
-        status: HttpStatus.OK,
-        data,
-        message: 'login successfully',
-      };
+      const data: LoginResponse = { accessToken, userData };
+      return data;
     } catch (error) {
-      throw HandleErrorException(error);
+      throw error;
     }
   }
 }

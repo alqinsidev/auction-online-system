@@ -8,7 +8,7 @@ import { Deposit } from './entities/deposit.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ResponseMessage } from 'src/common/interface/response/response.interface';
 import { DepositHistory } from './entities/deposit-history.entity';
-import HandleErrorException from '../../utils/errorHandler';
+import HandleErrorException from '../../utils/errorHandling.utils';
 import * as Sentry from '@sentry/node';
 
 describe('DepositService', () => {

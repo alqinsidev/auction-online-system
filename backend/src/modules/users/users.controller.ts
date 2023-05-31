@@ -3,27 +3,37 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   UseGuards,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
+import { ResponseFormat } from 'src/utils/response.utils';
+import HandleErrorException from 'src/utils/errorHandling.utils';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const data = await this.usersService.create(createUserDto);
+      return ResponseFormat(data, HttpStatus.CREATED, 'user has been created');
+    } catch (error) {
+      throw HandleErrorException(error);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const data = await this.usersService.findOne(id);
+      return ResponseFormat(data);
+    } catch (error) {
+      throw HandleErrorException(error);
+    }
   }
 }

@@ -15,7 +15,7 @@ interface UserData {
     email: string;
 }
 
-export interface AuthResponse {
+export interface LoginResponse {
     accessToken: string;
     userData: UserData;
 }
