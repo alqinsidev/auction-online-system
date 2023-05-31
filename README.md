@@ -156,13 +156,16 @@ The Online Auction System is also available online, deployed on Amazon EC2 as a 
 - This command will create the necessary tables and schema in the specified database.
 
   
+7. Run RabbitMQ with rabbitmq_delayed_message_exchange enabled:
 
+- You can use docker container version by running `docker run -d --name rabbitmq-broker -p  5672:5672 -p 15672:15672 alqinsidev/rabbitmq-delay-feature`
   
 
 ## Getting Started
+In order to run the project you have 2 option
 
+### Running project sepparetly
   
-
 1. Start the frontend server: `cd frontend && npm preview`
 
   
@@ -173,8 +176,14 @@ The Online Auction System is also available online, deployed on Amazon EC2 as a 
 
 3. Access the application in your browser at `http://localhost:5173`.
 
+  >This system need RabbitMQ with rabbitmq_delayed_message_exchange  plugin enabled in order to auto close the auction when the time is over.
   
+  ### Running as a docker container
+  1. Set all env file at `/docker/env` folder
   
+  2. Run docker compose command `cd docker && docker-compose up -d`
+
+4. Access the application in your browser at `http://localhost:8080`
 
 ## Testing
 
@@ -263,7 +272,7 @@ The Online Auction System allows users to list their items for auction and parti
   
   
 
-4. Once user submit the item, it will be saved as a draft.
+4. Once user submit the item, it will save as a draft.
 
 
 5. User item will not be listed on the auction unless the user publish their item.
