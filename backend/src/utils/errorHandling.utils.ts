@@ -36,15 +36,5 @@ const HandleErrorException = (error: any) => {
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-
-  // if (typeof error !== 'string') {
-  //   Sentry.captureException(error);
-  //   throw new HttpException(
-  //     'Internal server error',
-  //     HttpStatus.INTERNAL_SERVER_ERROR,
-  //   );
-  // } else {
-  //   throw new HttpException(error, HttpStatus.BAD_REQUEST);
-  // }
 };
 export default HandleErrorException;
