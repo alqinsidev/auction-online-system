@@ -1,14 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { StoreDepositDTO } from './dto/store-deposit.dto';
 import { AuthPayload } from '../../common/interface/auth/auth.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Deposit } from './entities/deposit.entity';
 import { DataSource, Repository } from 'typeorm';
 import { DepositHistory } from './entities/deposit-history.entity';
-import HandleErrorException, {
-  NotFoundError,
-} from '../../utils/errorHandling.utils';
-import { ResponseMessage } from '../../common/interface/response/response.interface';
+import { NotFoundError } from '../../utils/errorHandling.utils';
 import { StoreDepositResponse } from 'src/common/interface/deposit/deposit.interface';
 
 @Injectable()
@@ -17,6 +14,8 @@ export class DepositService {
     private dataSource: DataSource,
     @InjectRepository(Deposit)
     private depositRepository: Repository<Deposit>,
+    @InjectRepository(DepositHistory)
+    private depositHistoryRepository: Repository<DepositHistory>,
   ) {}
 
   async storeDeposit(
@@ -65,6 +64,24 @@ export class DepositService {
         throw new NotFoundError('id not found');
       }
       return myDeposit;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getMyDepositHistory(
+    authPayload: AuthPayload,
+  ): Promise<DepositHistory[]> {
+    try {
+      const myDepositHistory = await this.depositHistoryRepository.find({
+        where: {
+          user_id: authPayload.id,
+        },
+        order: {
+          created_at: 'DESC',
+        },
+      });
+      return myDepositHistory;
     } catch (error) {
       throw error;
     }

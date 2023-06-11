@@ -15,6 +15,7 @@ describe('DepositService', () => {
   let depositService: DepositService;
   let dataSource: DataSource;
   let depositRepository: Repository<Deposit>;
+  let depositHistoryRepository: Repository<DepositHistory>;
   const authPayload: AuthPayload = {
     id: '1',
     fullname: 'test',
@@ -33,6 +34,10 @@ describe('DepositService', () => {
           provide: getRepositoryToken(Deposit),
           useClass: Repository,
         },
+        {
+          provide: getRepositoryToken(DepositHistory),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
@@ -40,6 +45,9 @@ describe('DepositService', () => {
     dataSource = moduleRef.get<DataSource>(DataSource);
     depositRepository = moduleRef.get<Repository<Deposit>>(
       getRepositoryToken(Deposit),
+    );
+    depositHistoryRepository = moduleRef.get<Repository<DepositHistory>>(
+      getRepositoryToken(DepositHistory),
     );
   });
 
@@ -64,7 +72,6 @@ describe('DepositService', () => {
         store_amount: 50,
       };
 
-
       await expect(
         depositService.storeDeposit(storeDepositDto, authPayload),
       ).rejects.toThrow(Error);
@@ -72,6 +79,7 @@ describe('DepositService', () => {
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
   });
+
   describe('getMyDeposit', () => {
     it('should return the deposit for the authenticated user', async () => {
       const myDeposit = new Deposit();
@@ -84,6 +92,21 @@ describe('DepositService', () => {
       const result = await depositService.getMyDeposit(authPayload);
 
       expect(result).toEqual(myDeposit);
+    });
+  });
+
+  describe('getDepositHistory', () => {
+    it('should return all of my deposit history', async () => {
+      const myDeposit = new DepositHistory();
+      myDeposit.amount = 100000;
+      myDeposit.created_at = new Date().toISOString() as unknown as Timestamp;
+      myDeposit.isReturn = false;
+
+      jest
+        .spyOn(depositHistoryRepository, 'find')
+        .mockResolvedValue([myDeposit]);
+      const result = await depositService.getMyDepositHistory(authPayload);
+      expect(result).toEqual([myDeposit]);
     });
   });
 });

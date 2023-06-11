@@ -13,8 +13,10 @@ import { JwtAuthGuard } from '../jwt/jwt-auth.guard';
 import { AuthPayload } from 'src/common/interface/auth/auth.interface';
 import { ResponseFormat } from 'src/utils/response.utils';
 import HandleErrorException from 'src/utils/errorHandling.utils';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('deposit')
+@ApiTags('deposit')
 @UseGuards(JwtAuthGuard)
 export class DepositController {
   constructor(private readonly depositService: DepositService) {}
@@ -41,6 +43,17 @@ export class DepositController {
     try {
       const authPayload: AuthPayload = req.user;
       const data = await this.depositService.getMyDeposit(authPayload);
+      return ResponseFormat(data);
+    } catch (error) {
+      throw HandleErrorException(error);
+    }
+  }
+
+  @Get('history')
+  async getMyDepositHistory(@Request() req: any) {
+    try {
+      const authPayload: AuthPayload = req.user;
+      const data = await this.depositService.getMyDepositHistory(authPayload);
       return ResponseFormat(data);
     } catch (error) {
       throw HandleErrorException(error);
