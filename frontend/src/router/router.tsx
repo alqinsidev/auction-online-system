@@ -1,28 +1,25 @@
 import React from 'react'
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
-import { CreateItem, Home, Login, Register, StoreDeposit, MyItem, DetailItem } from '../pages'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
+import * as Pages from '../pages'
 import { AdminLayout } from '../components'
 
-
 const AppRouter: React.FC = () => {
-
-
-
-    return (
-        <Router>
-            <Routes>
-                <Route path='/login' element={<Login />} />
-                <Route path='/register' element={<Register />} />
-                <Route path='/' element={<AdminLayout />}>
-                    <Route path='home' element={<Home />} />
-                    <Route path='deposit' element={<StoreDeposit />} />
-                    <Route path='item' element={<MyItem />} />
-                    <Route path='item/new' element={<CreateItem />} />
-                    <Route path='item/detail/:id' element={<DetailItem />} />
-                </Route>
-            </Routes>
-        </Router>
-    )
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Pages.Login />} />
+        <Route path="/register" element={<Pages.Register />} />
+        <Route path="/" element={<AdminLayout />}>
+          <Route path="/" element={<Navigate to="home" />} />
+          <Route path="home" element={<Pages.Home />} />
+          <Route path="deposit" element={<Pages.StoreDeposit />} />
+          <Route path="item" element={<Pages.MyItem />} />
+          <Route path="item/new" element={<Pages.CreateItem />} />
+          <Route path="item/detail/:id" element={<Pages.DetailItem />} />
+        </Route>
+      </Routes>
+    </Router>
+  )
 }
 
 export default AppRouter
