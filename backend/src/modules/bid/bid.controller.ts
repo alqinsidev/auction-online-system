@@ -94,7 +94,7 @@ export class BidController {
   async bidHistory(@Param('id') id: string) {
     try {
       const data = await this.bidService.getBidHistory(id);
-      return data;
+      return ResponseFormat(data);
     } catch (error) {
       throw HandleErrorException(error);
     }
