@@ -35,7 +35,7 @@ const BidServices = {
     const url = status ? `/bid/auction?status=${status}` : "/bid/auction";
     return (await client.get(url)).data;
   },
-  getBidHistory: async (bid_id: string): Promise<ResponseMessage<any>> => {
+  getBidHistory: async (bid_id: string): Promise<ResponseMessage<BidResponse>> => {
     return (await client.get(`/bid/history/${bid_id}`)).data
   }
 };

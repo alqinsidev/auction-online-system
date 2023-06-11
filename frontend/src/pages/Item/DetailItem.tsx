@@ -29,7 +29,7 @@ const DetailItem = () => {
             title:'Bid Date',
             key: 'created_at',
             dataIndex:'created_at',
-            render: (data:string) => moment(data).format(`YYYY/MM/DD HH:mm`)
+            render: (data:string) => moment(data).format(`DD/MM/YY HH:mm`)
         },
     ]
     
