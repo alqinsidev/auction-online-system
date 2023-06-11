@@ -16,3 +16,11 @@ export interface GetMyDepositResponse {
   amount: number;
   updated_at: string;
 }
+
+export interface DepositHistory {
+  id: string;
+  user_id: string;
+  amount: number;
+  isReturn: boolean;
+  created_at: string;
+}

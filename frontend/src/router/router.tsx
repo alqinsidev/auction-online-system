@@ -12,7 +12,7 @@ const AppRouter: React.FC = () => {
         <Route path="/" element={<AdminLayout />}>
           <Route path="/" element={<Navigate to="home" />} />
           <Route path="home" element={<Pages.Home />} />
-          <Route path="deposit" element={<Pages.StoreDeposit />} />
+          <Route path="deposit" element={<Pages.Deposit />} />
           <Route path="item" element={<Pages.MyItem />} />
           <Route path="item/new" element={<Pages.CreateItem />} />
           <Route path="item/detail/:id" element={<Pages.DetailItem />} />

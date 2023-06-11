@@ -1,4 +1,5 @@
 import {
+  DepositHistory,
   GetMyDepositResponse,
   StoreDepositPayload,
   StoreDepositResponse,
@@ -23,6 +24,9 @@ const DepositServices = {
     store.dispatch(setDeposit(data.data.amount));
     return data;
   },
+  getMyDepositHistory: async (): Promise<ResponseMessage<DepositHistory[]>> => {
+    return (await client.get('/deposit/history')).data
+  }
 };
 
 export default DepositServices;
