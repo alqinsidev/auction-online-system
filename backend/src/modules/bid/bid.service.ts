@@ -220,7 +220,7 @@ export class BidService {
 
       const millisecondRemainingUntilEndDate = updatedBid.time_window * 3600000;
 
-      amqpHelper.publishMessage(
+      await amqpHelper.publishMessage(
         {
           task: 'AUTO_CLOSE_AUCTION',
           payload: { bid_id: updatedBid.id },
@@ -273,34 +273,34 @@ export class BidService {
         throw new BadRequestError(`you can't bid for your item`);
       }
 
-      if (makeBidDto.bid_amount > currentUserDeposit.amount) {
-        throw new BadRequestError('you have unsuficent deposit');
-      }
-
       if (bidItem.last_price >= makeBidDto.bid_amount) {
         throw new BadRequestError(
           'bid amount must be higher than last bid price',
         );
       }
 
-      const lastBidOnThisItem = await queryRunner.manager.findOne(BidHistory, {
-        where: {
-          bid_id: bidItem.id,
-          user_id: authPayload.id,
+      const userHaslastBidOnThisItem = await queryRunner.manager.findOne(
+        BidHistory,
+        {
+          where: {
+            bid_id: bidItem.id,
+            user_id: authPayload.id,
+          },
+          order: {
+            created_at: 'DESC',
+          },
         },
-        order: {
-          created_at: 'DESC',
-        },
-      });
+      );
 
       let depositBill = makeBidDto.bid_amount;
 
-      if (lastBidOnThisItem) {
-        depositBill = makeBidDto.bid_amount - lastBidOnThisItem.bid_amount;
+      if (userHaslastBidOnThisItem) {
+        depositBill =
+          makeBidDto.bid_amount - userHaslastBidOnThisItem.bid_amount;
 
         const timeDifference = moment.duration(
           moment().diff(
-            moment(lastBidOnThisItem.created_at as moment.MomentInput),
+            moment(userHaslastBidOnThisItem.created_at as moment.MomentInput),
           ),
         );
 
@@ -308,6 +308,11 @@ export class BidService {
           throw new BadRequestError('you need to wait 5s after your last bid');
         }
       }
+
+      if (depositBill > currentUserDeposit.amount) {
+        throw new BadRequestError('you have unsuficent deposit');
+      }
+
       currentUserDeposit.amount = currentUserDeposit.amount - depositBill;
 
       await queryRunner.manager.save(currentUserDeposit);
