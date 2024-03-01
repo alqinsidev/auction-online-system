@@ -103,6 +103,7 @@ By leveraging these technologies, including the use of Socket.IO for real-time b
 
 
 
+> NOTE: Deprecated
 
 The Online Auction System is also available online, deployed on Amazon EC2 as a Docker container. You can access the online version of the system [here](http://18.138.252.135:8080/home). Feel free to explore the features and functionalities of the system.
 
